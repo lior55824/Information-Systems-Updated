@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Available Flights | FLYTAU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+  {% include "topbar.html" %}
+
+  <main class="hero">
+    <section class="hero-card hero-card--wide">
+
+      <h1>Available Flights</h1>
+      <p class="subtitle">Results for your search</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Flights</h3>
+        </div>
+
+        <div class="table-wrap">
+          <table class="flights-table">
+            <thead>
+              <tr>
+                <th>Flight No.</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Date & Time</th>
+                <th>Price</th>
+                <th class="th-right">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% if flights and flights|length > 0 %}
+                {% for flight in flights %}
+                  <tr>
+                    <td><span class="badge">#{{ flight.Flight_ID }}</span></td>
+
+                    <!-- ORIGIN (From) -->
+                    <td>
+                      <div class="cell-title">{{ flight.origin_airport_name }}</div>
+                      <div class="cell-sub">{{ flight.origin_city }}, {{ flight.origin_country }}</div>
+                    </td>
+
+                    <!-- DESTINATION (To) -->
+                    <td>
+                      <div class="cell-title">{{ flight.dest_airport_name }}</div>
+                      <div class="cell-sub">{{ flight.dest_city }}, {{ flight.dest_country }}</div>
+                    </td>
+
+                    <td>
+                      <div class="cell-title">{{ flight.Departure_Date }}</div>
+                      <div class="cell-sub">{{ flight.Departure_Time }}</div>
+                    </td>
+
+                    <td><span class="price">${{ flight.Economy_Price }}</span></td>
+
+                    <td class="td-right">
+                      <a class="btn btn-secondary btn-small"
+                          href="{{ url_for('book_flight', flight_id=flight.Flight_ID) }}">
+                        Book Now
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="6" class="empty">
+                    <div class="empty-title">No flights found</div>
+                    <div class="empty-sub">Try changing the dates or destinations.</div>
+                  </td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="cta-row cta-row--below">
+        <a class="btn btn-secondary" href="{{ url_for('home_page') }}">Back to Search</a>
+      </div>
+
+    </section>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Management | FLYTAU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+  {% include "topbar.html" %}
+
+  <main class="page">
+    <div class="page-inner">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="alerts">
+            {% for category, msg in messages %}
+              <div class="alert {{ category }}">{{ msg }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <nav class="tabs">
+        <a class="tab {{ 'active' if active_tab == 'future' else '' }}"
+           href="{{ url_for('order_management', tab='future') }}">
+          Future Orders
+        </a>
+
+        <a class="tab {{ 'active' if active_tab == 'history' else '' }}"
+           href="{{ url_for('order_management', tab='history') }}">
+          Order History
+        </a>
+      </nav>
+
+      {% if active_tab == 'future' %}
+
+        <section class="card">
+          <h2>Future Orders</h2>
+          <p class="muted">View your upcoming bookings and cancel an order when available.</p>
+        </section>
+
+        {% if not user_is_registered %}
+          <section class="card">
+            <h3>Find Your Order</h3>
+            <p class="muted">
+              If you are not a registered user, please enter your Order ID and Email Address to locate your booking.
+            </p>
+
+            <form method="POST" action="{{ url_for('lookup_order') }}" class="form">
+              <div class="form-row">
+                <label for="unique_order_id">Order ID</label>
+                <input id="unique_order_id" name="unique_order_id" type="text" required />
+              </div>
+
+              <div class="form-row">
+                <label for="email_address">Email Address</label>
+                <input id="email_address" name="email_address" type="email" required />
+              </div>
+
+              <button type="submit" class="btn btn-primary">View Order</button>
+            </form>
+          </section>
+        {% endif %}
+
+        {% if future_orders and future_orders|length > 0 %}
+          {% for order in future_orders %}
+            <article class="card order-card">
+
+              <div class="order-head">
+                <h3 style="margin:0;">Order #{{ order.unique_order_id }}</h3>
+                <span class="status">{{ order.order_status }}</span>
+              </div>
+
+              <div class="order-body">
+                <p><strong>Flight ID:</strong> {{ order.flight_id }}</p>
+                <p><strong>Route:</strong> {{ order.origin_airport }} → {{ order.destination_airport }}</p>
+                <p><strong>Departure:</strong> {{ order.departure_date }} {{ order.departure_time }}</p>
+
+                {% if order.seats %}
+                  <p><strong>Seats:</strong> {{ order.seats|join(', ') }}</p>
+                {% endif %}
+
+                <p><strong>Tickets Quantity:</strong> {{ order.quantity_of_tickets }}</p>
+              </div>
+
+              <div class="order-actions">
+                <a class="btn btn-secondary"
+                   href="{{ url_for('order_details', unique_order_id=order.unique_order_id) }}">
+                  View Details
+                </a>
+
+                {% if order.cancellable %}
+                  <form method="POST" action="{{ url_for('cancel_order') }}" class="inline-form">
+                    <input type="hidden" name="unique_order_id" value="{{ order.unique_order_id }}">
+                    <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('Cancel order {{ order.unique_order_id }}? This action cannot be undone.');">
+                      Cancel Order
+                    </button>
+                  </form>
+                {% else %}
+                  <button type="button" class="btn btn-secondary" disabled>
+                    Cancellation Not Available
+                  </button>
+                {% endif %}
+              </div>
+
+            </article>
+          {% endfor %}
+        {% else %}
+          <section class="card empty">
+            {% if user_is_registered %}
+              <p>No future orders found.</p>
+            {% else %}
+              <p>Enter your Order ID and Email Address to view your future orders.</p>
+            {% endif %}
+          </section>
+        {% endif %}
+
+      {% else %}
+
+        <section class="card">
+          <h2>Order History</h2>
+
+          {% if user_is_registered %}
+            <p class="muted">Your previous orders are displayed below.</p>
+          {% else %}
+            <p class="muted">
+              Order history is available for registered users only. Please log in to view your order history.
+            </p>
+          {% endif %}
+        </section>
+
+        {% if user_is_registered %}
+          {% if past_orders and past_orders|length > 0 %}
+            {% for order in past_orders %}
+              <article class="card order-card">
+                <div class="order-head">
+                  <h3 style="margin:0;">Order #{{ order.unique_order_id }}</h3>
+                  <span class="status">{{ order.order_status }}</span>
+                </div>
+
+                <div class="order-body">
+                  <p><strong>Flight ID:</strong> {{ order.flight_id }}</p>
+                  <p><strong>Route:</strong> {{ order.origin_airport }} → {{ order.destination_airport }}</p>
+                  <p><strong>Departure:</strong> {{ order.departure_date }} {{ order.departure_time }}</p>
+
+                  {% if order.seats %}
+                    <p><strong>Seats:</strong> {{ order.seats|join(', ') }}</p>
+                  {% endif %}
+
+                  <p><strong>Tickets Quantity:</strong> {{ order.quantity_of_tickets }}</p>
+                </div>
+
+                <div class="order-actions">
+                  <a class="btn btn-secondary"
+                     href="{{ url_for('order_details', unique_order_id=order.unique_order_id) }}">
+                    View Details
+                  </a>
+                </div>
+              </article>
+            {% endfor %}
+          {% else %}
+            <section class="card empty">
+              <p>No past orders found.</p>
+            </section>
+          {% endif %}
+        {% endif %}
+
+      {% endif %}
+
+    </div>
+  </main>
+
+</body>
+</html>

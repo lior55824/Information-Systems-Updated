@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Details | FLYTAU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+  {% include "topbar.html" %}
+
+  <main class="page">
+    <div class="page-inner">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="alerts">
+            {% for category, msg in messages %}
+              <div class="alert {{ category }}">{{ msg }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section class="card">
+        <div class="order-head">
+          <h2 style="margin:0;">Order #{{ order.unique_order_id }}</h2>
+          <span class="status">{{ order.order_status }}</span>
+        </div>
+
+        <div class="order-body">
+          <p><strong>Email Address:</strong> {{ order.email_address }}</p>
+          <p><strong>Flight ID:</strong> {{ order.flight_id }}</p>
+          <p><strong>Route:</strong>{{ order.origin_airport_name }} ({{ order.origin_city }}, {{ order.origin_country }}) →
+          {{ order.dest_airport_name }} ({{ order.dest_city }}, {{ order.dest_country }})
+          </p>
+          <p><strong>Departure:</strong> {{ order.departure_date }} {{ order.departure_time }}</p>
+          <p><strong>Flight Date (Order):</strong> {{ order.flight_date }}</p>
+
+          {% if order.seats %}
+            <p><strong>Seats:</strong> {{ order.seats|join(', ') }}</p>
+          {% endif %}
+
+          <p><strong>Tickets Quantity:</strong> {{ order.quantity_of_tickets }}</p>
+        </div>
+
+        <div class="order-actions">
+          <a class="btn btn-secondary" href="{{ url_for('order_management', tab='future') }}">Back</a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>

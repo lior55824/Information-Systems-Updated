@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FLYTAU – Home</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+  {% include "topbar.html" %}
+
+  <main class="hero">
+    <section class="hero-card hero-card--wide">
+
+      <h1>Find your next flight</h1>
+      <p class="subtitle">Where would you like to go today?</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="search-card">
+        <form action="{{ url_for('available_flights') }}" method="GET" class="search-form">
+          <div class="search-grid search-grid--two-dates">
+
+            <div class="field">
+              <label for="origin_id">From</label>
+              <select id="origin_id" name="origin_id" required>
+                <option value="" disabled {{ 'selected' if not selected_origin else '' }}>Select Origin</option>
+                {% for airport in airports %}
+                  <option value="{{ airport.Airport_ID }}"
+                    {{ 'selected' if selected_origin == (airport.Airport_ID|string) else '' }}>
+                    {{ airport.Airport_Name }} ({{ airport.City }}, {{ airport.Country }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="destination_id">To</label>
+              <select id="destination_id" name="destination_id" required>
+                <option value="" disabled {{ 'selected' if not selected_destination else '' }}>Select Destination</option>
+                {% for airport in airports %}
+                  <option value="{{ airport.Airport_ID }}"
+                    {{ 'selected' if selected_destination == (airport.Airport_ID|string) else '' }}>
+                    {{ airport.Airport_Name }} ({{ airport.City }}, {{ airport.Country }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="start_date">Departure date</label>
+              <input id="start_date" type="date" name="start_date" value="{{ start_date or '' }}" min="{{ today }}">
+            </div>
+
+            <div class="field">
+              <label for="end_date">Return date</label>
+              <input id="end_date" type="date" name="end_date" value="{{ end_date or '' }}" min="{{ today }}">
+            </div>
+
+            <div class="field field--button">
+              <button type="submit" class="btn btn-primary search-btn">Search Flights</button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <div class="cta-row cta-row--below">
+        <a class="btn btn-secondary" href="{{ url_for('order_management', tab='future') }}">Order Management</a>
+      </div>
+
+    </section>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Seats | FLYTAU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+  {% include "topbar.html" %}
+
+  <main class="hero">
+    <section class="hero-card hero-card--wide">
+
+      <h1>Select Seats</h1>
+      <p class="subtitle">Order #{{ unique_order_id }} • Please select exactly <b>{{ needed }}</b> seats.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, msg in messages %}
+            <div class="alert {{ category }}">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="table-card" style="margin-top: 10px;">
+        <div class="table-header">
+          <h3>Seat Map</h3>
+        </div>
+
+        <form method="POST">
+          <div style="display:grid; grid-template-columns: repeat(6, 1fr); gap:12px;">
+            {% for s in seats %}
+              {% set seat_id = (s.Row_Num|string) + s.Column_Number %}
+              {% set is_locked = (seat_id in occupied) and (seat_id not in selected) %}
+
+              <label style="
+                border: 1px solid rgba(11, 27, 43, 0.12);
+                border-radius: 14px;
+                padding: 12px;
+                background: rgba(26, 163, 255, 0.06);
+                box-shadow: 0 6px 16px rgba(11, 27, 43, 0.06);
+                opacity: {{ '0.35' if is_locked else '1' }};
+                cursor: {{ 'not-allowed' if is_locked else 'pointer' }};
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                font-weight: 800;
+              ">
+                <input type="checkbox"
+                       name="seat_choice"
+                       value="{{ seat_id }}"
+                       {% if seat_id in selected %}checked{% endif %}
+                       {% if is_locked %}disabled{% endif %}
+                       style="width:18px; height:18px; margin:0;">
+                <span>
+                  <span style="font-weight:900;">{{ seat_id }}</span>
+                  <span style="color: rgba(11, 27, 43, 0.65); font-weight:800;"> ({{ s.Class }})</span>
+                </span>
+              </label>
+            {% endfor %}
+          </div>
+
+          <div class="cta-row cta-row--below" style="justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary" style="border: none; cursor: pointer;">
+              Save Seats
+            </button>
+            <a class="btn btn-secondary" href="{{ url_for('order_management', tab='future') }}">
+              Back to Orders
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <div class="hint">
+        Tip: disabled seats are already taken by other passengers.
+      </div>
+
+    </section>
+  </main>
+
+</body>
+</html>

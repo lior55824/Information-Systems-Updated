@@ -1,0 +1,15 @@
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="{{ url_for('home_page') }}">
+      <img class="brand-logo" src="{{ url_for('static', filename='images/flytau.png') }}" alt="FLYTAU logo">
+      <span class="brand-name">FLYTAU</span>
+    </a>
+
+    <nav class="nav">
+      <a class="nav-link" href="{{ url_for('home_page') }}">Home</a>
+      <a class="nav-link" href="{{ url_for('order_management', tab='future') }}">Order Management</a>
+      <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+      <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+    </nav>
+  </div>
+</header>

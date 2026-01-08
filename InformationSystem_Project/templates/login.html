@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FLY TAU | Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+  {% include "topbar.html" %}
+
+
+  <div class="auth-page">
+    <div class="auth-card">
+
+      <div class="auth-header">
+        <h1>Login</h1>
+        <p>Choose role and sign in</p>
+      </div>
+
+      <a href="{{ url_for('home_page') }}" class="back-home">← Return to Home</a>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('login') }}" class="auth-form" id="loginForm">
+
+        <!-- Role picker -->
+        <div class="role-picker">
+          <div class="role-title">Login as</div>
+
+          <label class="role-option">
+            <input type="radio" name="user_type" value="client" checked>
+            <span>Client</span>
+          </label>
+
+          <label class="role-option">
+            <input type="radio" name="user_type" value="admin">
+            <span>Admin</span>
+          </label>
+        </div>
+
+        <!-- Client fields -->
+        <div id="clientFields">
+          <label for="Email_Address">Email Address</label>
+          <input
+            type="email"
+            id="Email_Address"
+            name="Email_Address"
+            value="{{ Email_Address or '' }}"
+            placeholder="name@example.com"
+          >
+        </div>
+
+        <!-- Admin fields -->
+        <div id="adminFields" style="display:none;">
+          <label for="Worker_ID">Worker ID</label>
+          <input
+            type="text"
+            id="Worker_ID"
+            name="Worker_ID"
+            value="{{ Worker_ID or '' }}"
+            placeholder="e.g. 123456789"
+          >
+        </div>
+
+        <!-- Shared password -->
+        <label for="Password">Password</label>
+        <input
+          type="password"
+          id="Password"
+          name="Password"
+          placeholder="••••••••"
+          required
+        >
+
+        <button type="submit" class="btn btn-primary auth-btn">Sign In</button>
+
+        <div class="auth-actions">
+          <div class="helper-text">
+            Don't have an account?
+            <a href="{{ url_for('register') }}">Create here</a>
+          </div>
+        </div>
+      </form>
+
+      <div class="auth-footer">
+        <span>FLYTAU</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const radios = document.querySelectorAll('input[name="user_type"]');
+    const clientFields = document.getElementById('clientFields');
+    const adminFields = document.getElementById('adminFields');
+    const emailInput = document.getElementById('Email_Address');
+    const workerInput = document.getElementById('Worker_ID');
+
+    function syncRoleUI() {
+      const role = document.querySelector('input[name="user_type"]:checked').value;
+      const isAdmin = role === 'admin';
+
+      adminFields.style.display = isAdmin ? 'block' : 'none';
+      clientFields.style.display = isAdmin ? 'none' : 'block';
+
+      // required בהתאם לתפקיד
+      if (isAdmin) {
+        workerInput.required = true;
+        emailInput.required = false;
+        emailInput.value = "";
+      } else {
+        emailInput.required = true;
+        workerInput.required = false;
+        workerInput.value = "";
+      }
+    }
+
+    radios.forEach(r => r.addEventListener('change', syncRoleUI));
+    syncRoleUI();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | FLYTAU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1 style="margin:0;">Admin Dashboard</h1>
+      <p style="margin:6px 0 0;">Welcome, {{ admin_name }}.</p>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="page-inner">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="alerts">
+            {% for category, msg in messages %}
+              <div class="alert {{ category }}">{{ msg }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section class="card">
+        <h2>Actions</h2>
+        <div class="order-actions">
+          <a class="btn btn-primary" href="{{ url_for('admin_add_flight') }}">Add Flight</a>
+          <a class="btn btn-secondary" href="{{ url_for('admin_flights') }}">View / Cancel Flights</a>
+          <a class="btn btn-secondary" href="{{ url_for('admin_reports') }}">Statistics & Reports</a>
+          <a class="btn btn-secondary" href="{{ url_for('admin_logout') }}">Logout</a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flights | Admin | FLYTAU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1 style="margin:0;">Flights</h1>
+      <p style="margin:6px 0 0;">View existing flights and cancel up to 48 hours before departure.</p>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="page-inner">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="alerts">
+            {% for category, msg in messages %}
+              <div class="alert {{ category }}">{{ msg }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section class="card">
+        <div class="order-actions">
+          <a class="btn btn-primary" href="{{ url_for('admin_add_flight') }}">Add Flight</a>
+          <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">Back</a>
+        </div>
+      </section>
+
+      {% if flights and flights|length > 0 %}
+        {% for f in flights %}
+          <article class="card order-card">
+            <div class="order-head">
+              <h3 style="margin:0;">Flight #{{ f.Flight_ID }}</h3>
+              <span class="status">{{ f.Flight_Status }}</span>
+            </div>
+
+            <div class="order-body">
+              <p><strong>Route:</strong> {{ f.Origin_Airport }} → {{ f.Destination_Airport }}</p>
+              <p><strong>Departure:</strong> {{ f.Departure_Date }} {{ f.Departure_Time }}</p>
+              <p><strong>Duration:</strong> {{ f.Duration }}</p>
+              <p><strong>Plane:</strong> {{ f.Plane_ID }} ({{ f.Plane_Type }})</p>
+              <p><strong>Prices:</strong> Economy ${{ f.Economy_Price }} | Business ${{ f.Business_Price }}</p>
+            </div>
+
+            <div class="order-actions">
+              {% if f.can_cancel and f.Flight_Status != 'CANCELLED' %}
+                <form method="POST" action="{{ url_for('admin_cancel_flight') }}" class="inline-form">
+                  <input type="hidden" name="flight_id" value="{{ f.Flight_ID }}">
+                  <button type="submit" class="btn btn-danger"
+                          onclick="return confirm('Cancel flight {{ f.Flight_ID }}? This will cancel related orders and free seats.');">
+                    Cancel Flight
+                  </button>
+                </form>
+              {% else %}
+                <button type="button" class="btn btn-secondary" disabled>
+                  Cancellation Not Available
+                </button>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        <section class="card empty">
+          <p>No flights found.</p>
+        </section>
+      {% endif %}
+
+    </div>
+  </main>
+</body>
+</html>

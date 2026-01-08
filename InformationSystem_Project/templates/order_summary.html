@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Summary | FLYTAU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+  {% include "topbar.html" %}
+
+  <main class="hero">
+    <section class="hero-card hero-card--wide">
+
+      <h1>Order Summary</h1>
+      <p class="subtitle">Order #{{ order.unique_order_id }}</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Details</h3>
+        </div>
+
+        <div class="table-wrap">
+          <table class="flights-table">
+            <tbody>
+              <tr><th>Status</th><td>{{ order.order_status }}</td></tr>
+              <tr><th>Flight ID</th><td>#{{ order.flight_id }}</td></tr>
+             <tr><th>From</th><td>{{ order.origin_airport_name }} ({{ order.origin_city }}, {{ order.origin_country }})</td></tr>
+              <tr><th>To</th><td>{{ order.dest_airport_name }} ({{ order.dest_city }}, {{ order.dest_country }})</td></tr>
+              <tr><th>Departure</th><td>{{ order.departure_date }} {{ order.departure_time }}</td></tr>
+              <tr><th>Tickets</th><td>{{ order.quantity_of_tickets }}</td></tr>
+              <tr>
+                <th>Seats</th>
+                <td>
+                  {% if order.seats and order.seats|length > 0 %}
+                    {{ order.seats|join(", ") }}
+                  {% else %}
+                    (no seats selected yet)
+                  {% endif %}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {% set st = (order.order_status|string)|upper %}
+      {% if st not in ["CANCELLED", "CANCELLED_BY_AIRLINE"] %}
+        <div class="cta-row cta-row--below">
+          <a class="btn btn-secondary" href="{{ url_for('order_management', tab='future') }}">
+            Go to Order Management
+          </a>
+        </div>
+      {% else %}
+        <div class="cta-row cta-row--below">
+          <a class="btn btn-secondary" href="{{ url_for('order_management', tab='future') }}">
+            Back to Orders
+          </a>
+        </div>
+      {% endif %}
+
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmed | FLYTAU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+  {% include "topbar.html" %}
+
+  <main class="hero">
+    <section class="hero-card hero-card--wide">
+
+      <h1>Order Confirmed ✅</h1>
+      <p class="subtitle">Your order has been saved successfully.</p>
+
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Order #{{ order.unique_order_id }}</h3>
+        </div>
+
+        <div class="table-wrap">
+          <table class="flights-table">
+            <tbody>
+              <tr><th>Status</th><td>{{ order.order_status }}</td></tr>
+              <tr><th>Email</th><td>{{ order.email_address }}</td></tr>
+              <tr><th>Flight</th><td>#{{ order.flight_id }}</td></tr>
+              <tr><th>From</th><td>{{ order.origin_airport_name }} ({{ order.origin_city }}, {{ order.origin_country }})</td></tr>
+              <tr><th>To</th><td>{{ order.dest_airport_name }} ({{ order.dest_city }}, {{ order.dest_country }})</td></tr>
+              <tr><th>Departure</th><td>{{ order.departure_date }} {{ order.departure_time }}</td></tr>
+              <tr><th>Tickets</th><td>{{ order.quantity_of_tickets }}</td></tr>
+              <tr><th>Seats</th><td>{{ order.seats|join(", ") }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="cta-row cta-row--below">
+        <a class="btn btn-primary" href="{{ url_for('order_management', tab='future') }}">Go to Order Management</a>
+        <a class="btn btn-secondary" href="{{ url_for('home_page') }}">Back to Home</a>
+      </div>
+
+    </section>
+  </main>
+</body>
+</html>
